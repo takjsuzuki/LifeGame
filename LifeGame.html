@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Life Game With Canvas</title>
+
+
+<script>
+  function CountAlive (x,y,Lx,Ly,array){
+  var AliveCells = -array[x][y];
+
+  for(let i=0;i<3;i++){
+		 for(let j=0;j<3;j++){
+  				<!-- var xn = (x+i-1+Lx)%Lx; -->
+  				<!-- var yn = (y+j-1+Ly)%Ly; -->
+				<!-- AliveCells += array[xn][yn]; -->
+  				var xn = (x+i-1);
+  				var yn = (y+j-1);
+				if((0<=xn && 0<=yn) && (xn<Lx && yn<Ly)){
+					       AliveCells += array[xn][yn];
+					       }
+  				}
+  				}
+				
+  // document.write("Alive = "+AliveCells)
+  return AliveCells;
+  
+  }
+</script>
+
+
+<script>
+  function Boundary(array){
+  for (let i=0;i< array.length;i++){
+		  array[i][0] = 0;
+		  array[i][array[0].length-1] = 0;
+		  }
+		  for (let j=0;j< array[0].length;j++){
+				  array[0][j] = 0;
+				  array[array.length-1][j] = 0;
+				  }
+		  
+  return array
+  }
+</script>
+
+<script>
+  function Fate (present,AliveCells){
+  var next = 0;
+  if (present == 0){
+  if (AliveCells == 3){
+  next = 1;
+  }
+  }
+  else{
+  if(AliveCells == 2 || AliveCells == 3)
+  next = 1;
+  }
+  return next
+  }
+</script>
+
+<script>
+  function Forward(Lx,Ly,array) {
+  
+  for (let i=0;i<Lx;i++){
+  		  for(let j=0;j<Ly;j++){
+  				 array[i][j] = Fate (array[i][j],CountAlive(i,j,Lx,Ly,array));
+  				 }
+  				 }
+  //array = Boundary(array);
+  return array;
+  }
+
+  
+</script>
+
+
+
+
+<script>
+  function Draw(context,array){
+  cellsize = 10;
+  for (let i=0;i<array.length;i++){
+		   for(let j=0;j<array[0].length;j++){
+				   if(array[i][j] == 0){
+				  //context.fillStyle = 'rgb(255,00,00)'; //塗りつぶしの色は赤
+				  context.fillStyle = 'rgb(256,256,256)'; //塗りつぶしの色は赤
+				   }
+				   else{
+				   context.fillStyle = 'rgb(0,0,0)'; //塗りつぶしの色は赤
+				   }
+				   context.fillRect(cellsize*i,cellsize*j,cellsize,cellsize);
+				   }
+				   }
+
+  return 0;
+  }
+</script>
+
+
+
+
+<script src="/Users/tjsuzuki/Downloads/jsgif-master/b64.js"></script>
+<script src="/Users/tjsuzuki/Downloads/jsgif-master/LZWEncoder.js"></script>
+<script src="/Users/tjsuzuki/Downloads/jsgif-master/NeuQuant.js"></script>
+<script src="/Users/tjsuzuki/Downloads/jsgif-master/GIFEncoder.js"></script>
+<script>
+  function MakeGif(){
+
+  var Lx = 30
+  var Ly = 30
+
+  var canvas = document.getElementById('LifeGame');
+  var context = canvas.getContext("2d");
+  var encoder = new GIFEncoder();
+  encoder.setRepeat(0); //auto-loop
+  encoder.setDelay(100);//interval(ms)
+
+  canvas.width = Lx*10
+  canvas.height = Ly*10
+
+  var context = canvas.getContext('2d');
+  var Width = canvas.width;
+  var Height = canvas.height;
+  context.clearRect(0, 0, Width, Height);
+
+  var array = new Array(Lx);
+  for(let y = 0; y < Ly; y++) {
+		     array[y] = new Array(Lx).fill(0);
+		     }
+// Initialization
+		     for (let i=0; i< Lx;i++){
+				      for(let j=0;j< Ly;j++){
+						     //array[i][j] = Math.round(Math.random())
+						     if(Math.random()<0.1){
+								       array[i][j] = 1
+								       };
+}
+}
+  //array = Boundary(array);
+  encoder.start();
+  for(let y = 0; y < 100; y++) {
+		     render(context, Width, Height,Lx,Ly,array);
+		     encoder.addFrame(context);
+		     }
+
+  encoder.finish();
+
+
+//バイナリデータの編集
+var byteString = encoder.stream().getData() ;
+var ab = new ArrayBuffer(byteString.length);
+var ia = new Uint8Array(ab);
+for (var i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+}
+// Blobオブジェクトの生成
+var blob = new Blob( [ab], {type: "image/gif" });
+
+//a要素の生成
+var a = document.createElement("a");
+//BlobURLを取得しa要素のsrcへ与える
+a.href = window.URL.createObjectURL( blob );
+//PNGファイル名の命名
+a.download = "animation.gif";
+a.innerHTML = "gifアニメーション";
+//body要素にa要素を追加
+document.getElementsByTagName( "body" )[0].appendChild(a);
+		    
+		    
+								   
+  document.getElementById('outImg').src = 'data:image/gif;base64,'+encode64(encoder.stream().getData());
+
+  }
+</script>
+
+
+
+
+
+<script>
+  function render(context,Width,Height,Lx,Ly,array){
+
+  context.clearRect(0, 0, Width, Height);
+  Draw(context,array);
+  array = Forward(Lx,Ly,array);
+  
+  }
+</script>
+  
+<script type="text/javascript">
+
+function Loop() {
+
+
+var Lx = 30
+var Ly = 30
+
+//描画コンテキストの取得
+var canvas = document.getElementById('LifeGame');
+if (canvas.getContext) {
+
+canvas.width = Lx*10
+canvas.height = Ly*10
+
+
+var context = canvas.getContext('2d');
+var Width = canvas.width;
+var Height = canvas.height;
+context.clearRect(0, 0, Width, Height);
+
+var array = new Array(Lx);
+for(let y = 0; y < Ly; y++) {
+  array[y] = new Array(Lx).fill(0);
+}
+
+// Initialization
+for (  let i = 0;  i < Lx;  i++  ) {
+for (  let j = 0;  j < Ly;  j++  ) {
+		       <!-- array[i][j] = Math.round(Math.random()); -->
+		       if(Math.random()<0.1){
+					 array[i][j] = 1
+					 };
+
+}
+}
+
+		       //array = Boundary(array);
+
+
+//render(context, Width, Height,Lx,Ly,array);
+
+setInterval(render.bind(undefined, context, Width, Height,Lx,Ly,array), 1000);
+
+}
+
+		       }
+</script>
+
+
+
+
+
+
+
+
+
+
+</head>
+<!-- <body onLoad="Loop()"> -->
+<BODY onLoad="MakeGif()">
+<h2>Life Game With Canvas</h2>
+<canvas id="LifeGame" style="background-color:yellow;">
+図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+</canvas>
+</body>
+</html>
