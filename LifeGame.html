@@ -101,10 +101,12 @@
 
 
 
-<script src="/Users/tjsuzuki/Downloads/jsgif-master/b64.js"></script>
-<script src="/Users/tjsuzuki/Downloads/jsgif-master/LZWEncoder.js"></script>
-<script src="/Users/tjsuzuki/Downloads/jsgif-master/NeuQuant.js"></script>
-<script src="/Users/tjsuzuki/Downloads/jsgif-master/GIFEncoder.js"></script>
+<script src="./jsgif/b64.js"></script>
+<script src="./jsgif/LZWEncoder.js"></script>
+<script src="./jsgif/NeuQuant.js"></script>
+<script src="./jsgif/GIFEncoder.js"></script>
+
+
 <script>
   function MakeGif(){
 
@@ -251,8 +253,10 @@ setInterval(render.bind(undefined, context, Width, Height,Lx,Ly,array), 1000);
 <!-- <body onLoad="Loop()"> -->
 <BODY onLoad="MakeGif()">
 <h2>Life Game With Canvas</h2>
-<canvas id="LifeGame" style="background-color:yellow;">
-図形を表示するには、canvasタグをサポートしたブラウザが必要です。
+<canvas id="LifeGame" style="background-color:white;">
 </canvas>
+<script>
+document.write("\n\n図形を表示するには、canvasタグをサポートしたブラウザが必要です。\n\n");
+</script> 
 </body>
 </html>
